@@ -4,7 +4,7 @@ Adds a DSL to ActionController that allows to add strong params filtering withou
 
 ## Why?
 
-(Rails's Strong Parameters)[http://edgeapi.rubyonrails.org/classes/ActionController/StrongParameters.html] is obviously a better approach than having the model decide which attributes are protected or not. The only problem I have with this is the need to add an ugly method (at least one) to the controller to filter and whitelist the parameters.
+[Rails's Strong Parameters](http://edgeapi.rubyonrails.org/classes/ActionController/StrongParameters.html) is obviously a better approach than having the model decide which attributes are protected or not. The only problem I have with this is the need to add an ugly method (at least one) to the controller to filter and whitelist the parameters.
 
 BetterStrongParams is simply a way to create those methods via DSL instead of a manually typing them, seems like it is a more naturally looking interface for a good idea.
 
