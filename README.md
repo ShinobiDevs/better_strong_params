@@ -32,7 +32,7 @@ BetterStrongParams allows you to use the `filter_parameters` method in your cont
 
 ```ruby
   class UsersController < ApplicationController
-    filter_parameters create: {post: [:title, :body],}, ...
+    filter_parameters create: {post: [:title, :body]}, ...
   end
 ```
 
@@ -49,7 +49,7 @@ for every controller action you set using `filter_parameters`, a method named `#
 ```ruby
   class UsersController < ApplicationController
 
-    filter_parameters create: {post: [:title, :body],}
+    filter_parameters create: {post: [:title, :body]}
 
     def create
       @user = User.new(create_params) # => create_params is available via BetterStrongParams and the filter_parameters DSL.
