@@ -49,7 +49,7 @@ for every controller action you set using `filter_parameters`, a method named `#
 ```ruby
   class UsersController < ApplicationController
 
-    filter_parameters create: {post: [:title, :body]}
+    filter_parameters create: {user: [:name, :age]}
 
     def create
       @user = User.new(create_params) # => create_params is available via BetterStrongParams and the filter_parameters DSL.
@@ -61,6 +61,37 @@ for every controller action you set using `filter_parameters`, a method named `#
     end
   end
 ```
+
+or if you want a single whitelist params set for all of the controller methods, BetterStrongParams will automatically generate one method named after your controller's singular resource
+
+```ruby
+  class UsersController < ApplicationController
+
+    filter_parameters all: {user: [:name, :age]}
+
+    def create
+
+      # If you specify the 'all' option, user_params will be available.
+      @user = User.new(user_params)
+      if @user.save
+        redirect_to treasure_url
+      else
+        redirect_to jail_url
+      end
+    end
+
+    def update
+      @user = User.find(params[:id])
+      if @user.update_attributes(user_params)
+        redirect_to treasure_url
+      else
+        redirect_to jail_url
+      end
+    end
+
+  end
+```
+
 
 ## Contributing
 
