@@ -8,22 +8,31 @@ module BetterStrongParams
     end
   end
 
+  module Exceptions
+    class Deprecated < RuntimeError; end
+  end
+
   module ClassMethods
+
     def filter_parameters(options = {})
-      params_method_name = options[:as] || self.name.demodulize.gsub(/Controller$/,'').singularize.downcase
-      action_names = options.keys
-      if action_names.first.to_sym == :all
-        define_method("#{params_method_name}_params") do
-          base = options[:all].keys.first
-          params.require(base).permit(*options[:all][base])
+      raise(BetterStrongParams::Exceptions::Deprecated, "filter_parameters was deprecated in version 0.0.3, please refer to https://github.com/ShinobiDevs/better_strong_params for more information on the new DSL.")
+    end
+
+    def whitelist_parameters(options = {})
+
+      alias_method :_params, :params
+
+      define_method("params") do
+        filtered = {}
+        top_level_params = options.keys
+        top_level_params.each do |top_level_param|
+          filtered[top_level_param] = _params.require(top_level_param).permit(*options[top_level_param])
         end
-      else
-        action_names.each do |action_name|
-          define_method("#{action_name.to_s}_params") do
-            base = options[action_name].keys.first
-            params.require(base).permit(*options[action_name][base])
-          end
+
+        (_params.keys.map(&:to_s) - options.keys.map(&:to_s)).each do |root_level_param|
+          filtered[root_level_param] = _params[root_level_param]
         end
+        ActionController::Parameters.new(filtered).permit!
       end
     end
   end

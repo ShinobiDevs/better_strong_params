@@ -2,6 +2,9 @@
 
 Adds a DSL to ActionController that allows to add strong params filtering without adding a specific, dirty controller method.
 
+# DSL Changes in 0.0.3
+
+- `whitelist_parameters`
 ## Why?
 
 [Rails's Strong Parameters](http://edgeapi.rubyonrails.org/classes/ActionController/StrongParameters.html) is obviously a better approach than having the model decide which attributes are protected or not. The only problem I have with this is the need to add an ugly method (at least one) to the controller to filter and whitelist the parameters.
@@ -28,67 +31,37 @@ BetterStrongParams is automatically included in ActionController::Base, so you d
 
 ## Usage
 
-BetterStrongParams allows you to use the `filter_parameters` method in your controllers:
+BetterStrongParams allows you to use the `whitelist_parameters` method in your controllers:
 
 ```ruby
   class UsersController < ApplicationController
-    filter_parameters create: {post: [:title, :body]}, ...
+    whitelist_parameters post: [:title, :body], user: [:name, :age], ....
   end
 ```
 
-`filter_parameters` accepts an option hash specifing a method name, a _required_ parameter and a permitted parameters list like this
+`whitelist_parameters` a representation of a hash as you would enter in normal Strong Parameters method:
 
 ```
-  controller_action_name: {required_param_name: [permitted1, permitted2,...]}, controller_action_name2: ....
+  top_level_key: [attribute, attribute], another_top_level: [...], ...
 ```
 
-for every controller action you set using `filter_parameters`, a method named `#{controller_action}_params` will be created and will be ready to use when you want it.
+Unlike many other Strong Parameters implementations in which you would have to define a sanitizing method (`user_params`), BetterStrongParams lets you keep on using the regular `params` hash
 
 
-### Full example
+## Full example
 ```ruby
   class UsersController < ApplicationController
 
-    filter_parameters create: {user: [:name, :age]}
+    whitelist_parameters user: [:name, :age]
 
     def create
-      @user = User.new(create_params) # => create_params is available via BetterStrongParams and the filter_parameters DSL.
+      @user = User.new(params[:user]) # => params[:user] is being whitelisted without the need to define / create the extra method.
       if @user.save
         redirect_to treasure_url
       else
         redirect_to jail_url
       end
     end
-  end
-```
-
-or if you want a single whitelist params set for all of the controller methods, BetterStrongParams will automatically generate one method named after your controller's singular resource
-
-```ruby
-  class UsersController < ApplicationController
-
-    filter_parameters all: {user: [:name, :age]}
-
-    def create
-
-      # If you specify the 'all' option, user_params will be available.
-      @user = User.new(user_params)
-      if @user.save
-        redirect_to treasure_url
-      else
-        redirect_to jail_url
-      end
-    end
-
-    def update
-      @user = User.find(params[:id])
-      if @user.update_attributes(user_params)
-        redirect_to treasure_url
-      else
-        redirect_to jail_url
-      end
-    end
-
   end
 ```
 
